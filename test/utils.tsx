@@ -1,32 +1,23 @@
-import { RouterContext, BlitzRouter, BlitzProvider } from "blitz"
 import { render as defaultRender } from "@testing-library/react"
 import { renderHook as defaultRenderHook } from "@testing-library/react-hooks"
+import { BlitzProvider, BlitzRouter, RouterContext } from "blitz"
 
-export * from "@testing-library/react"
+type DefaultParams = Parameters<typeof defaultRender>
+type RenderUI = DefaultParams[0]
+type RenderOptions = DefaultParams[1] & { router?: Partial<BlitzRouter>; dehydratedState?: unknown }
 
-// --------------------------------------------------------------------------------
-// This file customizes the render() and renderHook() test functions provided
-// by React testing library. It adds a router context wrapper with a mocked router.
-//
-// You should always import `render` and `renderHook` from this file
-//
-// This is the place to add any other context providers you need while testing.
-// --------------------------------------------------------------------------------
+type DefaultHookParams = Parameters<typeof defaultRenderHook>
+type RenderHook = DefaultHookParams[0]
+type RenderHookOptions = DefaultHookParams[1] & {
+  router?: Partial<BlitzRouter>
+  dehydratedState?: unknown
+}
 
-// --------------------------------------------------
-// render()
-// --------------------------------------------------
-// Override the default test render with our own
-//
-// You can override the router mock like this:
-//
-// const { baseElement } = render(<MyComponent />, {
-//   router: { pathname: '/my-custom-pathname' },
-// });
-// --------------------------------------------------
-export function render(ui: RenderUI, { wrapper, router, dehydratedState, ...options }: RenderOptions = {}) {
+export const render = (
+  ui: RenderUI,
+  { wrapper, router, dehydratedState, ...options }: RenderOptions = {}
+) => {
   if (!wrapper) {
-    // Add a default context wrapper if one isn't supplied from the test
     wrapper = ({ children }) => (
       <BlitzProvider dehydratedState={dehydratedState}>
         <RouterContext.Provider value={{ ...mockRouter, ...router }}>
@@ -35,26 +26,15 @@ export function render(ui: RenderUI, { wrapper, router, dehydratedState, ...opti
       </BlitzProvider>
     )
   }
+
   return defaultRender(ui, { wrapper, ...options })
 }
 
-// --------------------------------------------------
-// renderHook()
-// --------------------------------------------------
-// Override the default test renderHook with our own
-//
-// You can override the router mock like this:
-//
-// const result = renderHook(() => myHook(), {
-//   router: { pathname: '/my-custom-pathname' },
-// });
-// --------------------------------------------------
-export function renderHook(
+export const renderHook = (
   hook: RenderHook,
-  { wrapper, router, dehydratedState,...options }: RenderHookOptions = {}
-) {
+  { wrapper, router, dehydratedState, ...options }: RenderHookOptions = {}
+) => {
   if (!wrapper) {
-    // Add a default context wrapper if one isn't supplied from the test
     wrapper = ({ children }) => (
       <BlitzProvider dehydratedState={dehydratedState}>
         <RouterContext.Provider value={{ ...mockRouter, ...router }}>
@@ -63,10 +43,11 @@ export function renderHook(
       </BlitzProvider>
     )
   }
+
   return defaultRenderHook(hook, { wrapper, ...options })
 }
 
-export const mockRouter: BlitzRouter =     {
+export const mockRouter: BlitzRouter = {
   basePath: "",
   pathname: "/",
   route: "/",
@@ -89,11 +70,3 @@ export const mockRouter: BlitzRouter =     {
   },
   isFallback: false,
 }
-
-type DefaultParams = Parameters<typeof defaultRender>
-type RenderUI = DefaultParams[0]
-type RenderOptions = DefaultParams[1] & { router?: Partial<BlitzRouter>, dehydratedState?: unknown }
-
-type DefaultHookParams = Parameters<typeof defaultRenderHook>
-type RenderHook = DefaultHookParams[0]
-type RenderHookOptions = DefaultHookParams[1] & { router?: Partial<BlitzRouter>, dehydratedState?: unknown }
