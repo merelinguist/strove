@@ -9,6 +9,7 @@ export const ChangePassword = z.object({
 
 export const CreateDeck = z.object({
   name: z.string(),
+  cards: z.array(z.object({ front: z.string(), back: z.string() })),
 })
 
 export const CreateResponses = z.array(z.object({ correctness: z.number(), cardId: z.string() }))

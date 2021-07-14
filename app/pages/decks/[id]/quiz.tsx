@@ -13,7 +13,7 @@ const Quiz = () => {
   const router = useRouter()
   const id = useParam("id", "string")
   const [{ cards }] = useQuery(getDeck, { id })
-  cards.length = 1
+  cards.length = 10
   const {
     state: { isSubmitting, responses },
     dispatch,
